@@ -20,12 +20,12 @@ class APIServer:
     ) -> None:
         self._init_logger()
         self.name = name
-        #self.container = ProvidersManager().make_container()
+        # self.container = ProvidersManager().make_container()
         self.app = FastAPI(
             title=name,
             lifespan=self._lifespan,
         )
-        #self._init_dishka()
+        # self._init_dishka()
         self.routers = routers or []
         self._init_routers()
         self.start_callbacks = start_callbacks or []
