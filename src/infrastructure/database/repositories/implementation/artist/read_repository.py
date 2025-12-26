@@ -2,20 +2,19 @@ from typing import List, Optional
 from uuid import UUID
 
 from bson import ObjectId
-from domain.entities.artist import Artist
-from domain.repositories.artist import ArtistReadRepository
 
+from domain.repositories.artist import ArtistReadRepositoryAbs
 from infrastructure.database.database_adapter import MongoDatabaseAdapter
 from infrastructure.database.models import Collections
 
 
-class ArtistReadRepositoryImpl(ArtistReadRepository):
+class ArtistReadRepository(ArtistReadRepositoryAbs):
 
     def __init__(self, mongo_adapter: MongoDatabaseAdapter):
         self.mongo_adapter = mongo_adapter
-        self.collection_name = Collections.ARTIST.value
+        self.collection_name = Collections.ARTIST
 
-    async def get_by_id(self, artist_id: str) -> Optional[Artist]:
+    async def get_by_id(self, artist_id: str):
         async with self.mongo_adapter.open_session() as session:
             collection = await self.mongo_adapter.get_collection(self.collection_name)
             if ObjectId.is_valid(artist_id):
@@ -29,13 +28,13 @@ class ArtistReadRepositoryImpl(ArtistReadRepository):
 
             return doc
 
-    async def get_by_name(self, name: str) -> Optional[Artist]:
+    async def get_by_name(self, name: str):
         async with self.mongo_adapter.open_session() as session:
             collection = await self.mongo_adapter.get_collection(self.collection_name)
             doc = await collection.find_one({"name": name}, session=session)
             return doc
 
-    async def search(self, query: str, limit: int = 20) -> List[Artist]:
+    async def search(self, query: str, limit: int = 20):
         async with self.mongo_adapter.open_session() as session:
             collection = await self.mongo_adapter.get_collection(self.collection_name)
             cursor = (
