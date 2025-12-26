@@ -38,9 +38,9 @@ class BaseMongoModel(BaseModel):
     created_at: datetime = Field(default=datetime.now())
     updated_at: datetime = Field(default=datetime.now())
 
-    @property
-    def collection_name(self) -> str:
-        return type(self).__name__
+    @classmethod
+    def collection_name(cls) -> str:
+        return type(cls).__name__
 
     class Config:
         arbitrary_types_allowed = True
