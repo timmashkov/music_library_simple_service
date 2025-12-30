@@ -1,11 +1,12 @@
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi_filter import FilterDepends
 
 from application.use_cases.command_use_caces import CommandArtistUseCases
 from application.use_cases.queries_use_caces import QueryArtistUseCases
 from presentation.models._common import ResponseStatusModel
-from presentation.models.artist import CreateArtistModel, UpdateArtistModel
+from presentation.models.artist import CreateArtistModel, UpdateArtistModel, ArtistFilter
 
 
 class ArtistRouter:
@@ -22,6 +23,14 @@ class ArtistRouter:
         artist._id = str(artist._id)
         return artist
 
+    @staticmethod
+    @api_router.get("/")
+    @inject
+    async def get_users_list(
+            use_cases: FromDishka[QueryArtistUseCases],
+            filters: ArtistFilter = FilterDepends(ArtistFilter),
+    ):
+        return await use_cases.execute_read_users(filters)
     @staticmethod
     @api_router.post("/")
     @inject

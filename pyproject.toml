@@ -1,6 +1,6 @@
 [project]
 name = "music-library"
-version = "0.0.3"
+version = "0.0.4"
 description = ""
 authors = [
     {name = "timmashkov",email = "bodomizer@yandex.ru"}
@@ -16,7 +16,8 @@ dependencies = [
     "black (>=25.12.0,<26.0.0)",
     "dishka (>=1.7.2,<2.0.0)",
     "motor (>=3.7.1,<4.0.0)",
-    "fastapi-filter (>=2.0.1,<3.0.0)"
+    "fastapi-filter[mongo] (>=2.0.1,<3.0.0)",
+    "mongoengine (>=0.29.1,<0.30.0)",
 ]
 
 
