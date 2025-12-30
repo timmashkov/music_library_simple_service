@@ -2,9 +2,12 @@ from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from typing import Any, List, Optional
 
+from fastapi_filter.contrib.mongoengine import Filter
 from pydantic import BaseModel, Field
 
 from application.entities.enums import ArtistType, Genres
+from infrastructure.database.models import Artist
+from presentation.models._filter import _APIFilter
 
 
 class UpdateArtistModel(BaseModel):
@@ -26,3 +29,14 @@ class CreateArtistModel(UpdateArtistModel):
 class ResponseArtistDomainModel(CreateArtistModel):
     created_at: datetime
     updated_at: datetime
+
+
+class ArtistFilter(_APIFilter):
+
+    name: str | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    sorted_by: list[str] = Field(default=["created_at"])
+
+    class Constants(Filter.Constants):
+        model = Artist

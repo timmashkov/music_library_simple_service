@@ -34,7 +34,7 @@ class _ObjectId(ObjectId):
 class BaseMongoModel(BaseModel):
     name: str
     external_ids: list[str] = None
-    id: _ObjectId | None = Field(default=None, alias="_id")
+    id: _ObjectId
     created_at: datetime = Field(default=datetime.now())
     updated_at: datetime = Field(default=datetime.now())
 

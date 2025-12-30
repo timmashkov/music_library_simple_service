@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, List, Optional
 
+from presentation.models._filter import _APIFilter
+
 
 class ArtistReadRepositoryAbs(ABC):
 
@@ -14,12 +16,8 @@ class ArtistReadRepositoryAbs(ABC):
         pass
 
     @abstractmethod
-    async def search(self, query: str, limit: int = 20) -> List[Any]:
+    async def search(self, query: _APIFilter) -> List[Any]:
         pass
-
-    # @abstractmethod
-    # async def get_by_genre(self, genre: str, limit: int = 20) -> List[Any]:
-    #     pass
 
 
 class ArtistWriteRepositoryAbs(ABC):
