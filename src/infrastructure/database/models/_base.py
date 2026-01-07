@@ -40,7 +40,7 @@ class BaseMongoModel(BaseModel):
 
     @classmethod
     def collection_name(cls) -> str:
-        return type(cls).__name__
+        return cls.__name__
 
     class Config:
         arbitrary_types_allowed = True

@@ -8,6 +8,11 @@ from domain.entities.artist import (
     ResponseArtistDomainModel,
     UpdateArtistDomainModel,
 )
+from domain.entities.album import (
+    CommandAlbumDomainModel,
+    ResponseAlbumDomainModel,
+)
+from domain.repositories.album import AlbumWriteRepositoryAbs
 from domain.repositories.artist import ArtistWriteRepositoryAbs
 
 
@@ -34,3 +39,28 @@ class CommandArtistUseCases:
 
     async def execute_delete_user(self, artist_id: str) -> bool:
         return await self.artist_repository.delete(artist_id)
+
+
+class CommandAlbumUseCases:
+    def __init__(self, artist_repository: AlbumWriteRepositoryAbs) -> None:
+        self.album_repository = artist_repository
+
+    async def execute_create_user(self, **kwargs) -> ResponseAlbumDomainModel:
+        command = CommandAlbumDomainModel(**kwargs)
+        inserted_doc = await self.album_repository.create(
+            **command.as_dict(), created_at=datetime.now(timezone.utc)
+        )
+        return ResponseAlbumDomainModel(**inserted_doc)
+
+    async def execute_update_user(self, **kwargs) -> ResponseAlbumDomainModel:
+        artist_id = kwargs.pop("artist_id")
+        command = UpdateArtistDomainModel(**kwargs)
+        updated_doc = await self.album_repository.update(
+            artist_id=artist_id,
+            artist=command.as_dict(),
+            updated_at=datetime.now(timezone.utc),
+        )
+        return ResponseAlbumDomainModel(**updated_doc)
+
+    async def execute_delete_user(self, artist_id: str) -> bool:
+        return await self.album_repository.delete(artist_id)

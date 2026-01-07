@@ -3,16 +3,16 @@ from typing import Any
 
 from bson import ObjectId
 
-from domain.repositories.artist import ArtistWriteRepositoryAbs
+from domain.repositories.album import AlbumWriteRepositoryAbs
 from infrastructure.database.database_adapter import MongoDatabaseAdapter
 from infrastructure.database.models import Collections
 
 
-class ArtistWriteRepository(ArtistWriteRepositoryAbs):
+class AlbumWriteRepository(AlbumWriteRepositoryAbs):
 
     def __init__(self, mongo_adapter: MongoDatabaseAdapter) -> None:
         self.mongo_adapter = mongo_adapter
-        self.collection_name = Collections.ARTIST
+        self.collection_name = Collections.ALBUM
 
     async def create(self, **kwargs) -> dict[str, Any]:
         async with self.mongo_adapter.open_session() as session:

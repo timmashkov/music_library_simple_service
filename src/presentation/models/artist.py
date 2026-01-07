@@ -27,6 +27,7 @@ class CreateArtistModel(UpdateArtistModel):
 
 
 class ResponseArtistDomainModel(CreateArtistModel):
+    id: str
     created_at: datetime
     updated_at: datetime
 

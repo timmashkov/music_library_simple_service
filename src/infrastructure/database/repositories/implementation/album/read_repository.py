@@ -2,16 +2,16 @@ from typing import Any
 
 from bson import ObjectId
 
-from domain.repositories.artist import ArtistReadRepositoryAbs
+from domain.repositories.album import AlbumReadRepositoryAbs
 from infrastructure.database.database_adapter import MongoDatabaseAdapter
 from infrastructure.database.models import Collections
 
 
-class ArtistReadRepository(ArtistReadRepositoryAbs):
+class AlbumReadRepository(AlbumReadRepositoryAbs):
 
-    def __init__(self, mongo_adapter: MongoDatabaseAdapter):
+    def __init__(self, mongo_adapter: MongoDatabaseAdapter) -> None:
         self.mongo_adapter = mongo_adapter
-        self.collection_name = Collections.ARTIST
+        self.collection_name = Collections.ALBUM
 
     async def get_by_id(self, artist_id: str) -> dict[str, Any]:
         async with self.mongo_adapter.open_session() as session:
