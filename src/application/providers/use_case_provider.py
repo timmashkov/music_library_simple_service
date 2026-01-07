@@ -1,7 +1,7 @@
 from dishka import Provider, Scope, provide
 
-from application.use_cases.command_use_caces import CommandArtistUseCases, CommandAlbumUseCases
-from application.use_cases.queries_use_caces import QueryArtistUseCases, QueryAlbumUseCases
+from application.use_cases.command_use_caces import CommandArtistUseCases, CommandAlbumUseCases, CommandTrackUseCases
+from application.use_cases.queries_use_caces import QueryArtistUseCases, QueryAlbumUseCases, QueryTrackUseCases
 from infrastructure.database.repositories.implementation.artist.read_repository import (
     ArtistReadRepository,
 )
@@ -13,6 +13,12 @@ from infrastructure.database.repositories.implementation.album.read_repository i
 )
 from infrastructure.database.repositories.implementation.album.write_repository import (
     AlbumWriteRepository,
+)
+from infrastructure.database.repositories.implementation.track.read_repository import (
+    TrackReadRepository,
+)
+from infrastructure.database.repositories.implementation.track.write_repository import (
+    TrackWriteRepository,
 )
 
 
@@ -40,3 +46,15 @@ class UseCaseProvider(Provider):
             self, _repository: AlbumWriteRepository
     ) -> CommandAlbumUseCases:
         return CommandAlbumUseCases(_repository)
+
+    @provide(scope=Scope.REQUEST)
+    def provide_query_track_use_cases(
+            self, _repository: TrackReadRepository
+    ) -> QueryTrackUseCases:
+        return QueryTrackUseCases(_repository)
+
+    @provide(scope=Scope.REQUEST)
+    def provide_command_track_use_cases(
+            self, _repository: TrackWriteRepository
+    ) -> CommandTrackUseCases:
+        return CommandTrackUseCases(_repository)
