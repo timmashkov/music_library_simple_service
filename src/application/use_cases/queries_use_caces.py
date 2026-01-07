@@ -3,8 +3,10 @@ from uuid import UUID
 
 from domain.entities.album import ResponseAlbumDomainModel
 from domain.entities.artist import ResponseArtistDomainModel
+from domain.entities.track import CommandTrackDomainModel
 from domain.repositories.album import AlbumReadRepositoryAbs
 from domain.repositories.artist import ArtistReadRepositoryAbs
+from domain.repositories.track import TrackReadRepositoryAbs
 
 
 class QueryArtistUseCases:
@@ -29,3 +31,15 @@ class QueryAlbumUseCases:
     async def execute_read_album(self, name: str) -> ResponseAlbumDomainModel:
         artist = await self.album_repository.get_by_id(name)
         return ResponseAlbumDomainModel(**artist)
+
+
+class QueryTrackUseCases:
+    def __init__(self, track_repository: TrackReadRepositoryAbs) -> None:
+        self.track_repository = track_repository
+
+    async def execute_read_tracks(self, filters: Any) -> list[CommandTrackDomainModel] | None:
+        return await self.track_repository.search(filters)
+
+    async def execute_read_track(self, name: str) -> CommandTrackDomainModel:
+        artist = await self.track_repository.get_by_id(name)
+        return CommandTrackDomainModel(**artist)
