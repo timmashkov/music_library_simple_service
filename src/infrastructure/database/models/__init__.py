@@ -1,7 +1,7 @@
 from enum import StrEnum
 
-from .artist import Artist
 from .album import Album
+from .artist import Artist
 from .track import Track
 
 

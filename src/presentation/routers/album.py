@@ -1,65 +1,66 @@
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter
 from fastapi_filter import FilterDepends
 
 from application.use_cases.command_use_caces import CommandAlbumUseCases
 from application.use_cases.queries_use_caces import QueryAlbumUseCases
 from presentation.models._common import ResponseStatusModel
-from presentation.models.album import CommandAlbumModel, ResponseAlbumModel, AlbumFilter
+from presentation.models.album import AlbumFilter, CommandAlbumModel, ResponseAlbumModel
+from presentation.routers import BaseRouter
 
 
-class AlbumRouter:
+class AlbumRouter(BaseRouter):
     api_router = APIRouter(prefix="/albums", tags=["albums"])
+    input_model = CommandAlbumModel
+    output_model = ResponseAlbumModel
 
     @staticmethod
-    @api_router.get("/{name}")
+    @api_router.get("/{name}", response_model=output_model)
     @inject
-    async def get_artist(
+    async def get_album(
         name: str,
         use_cases: FromDishka[QueryAlbumUseCases],
     ):
-        artist = await use_cases.execute_read_album(name)
-        artist._id = str(artist._id)
-        return artist
+        return await use_cases.execute_read_album(name)
 
     @staticmethod
-    @api_router.get("/")
+    @api_router.get("/", response_model=list[output_model])
     @inject
-    async def get_users_list(
-            use_cases: FromDishka[QueryAlbumUseCases],
-            filters: AlbumFilter = FilterDepends(AlbumFilter),
+    async def get_albums_list(
+        use_cases: FromDishka[QueryAlbumUseCases],
+        filters: AlbumFilter = FilterDepends(AlbumFilter),
     ):
+        print(await use_cases.execute_read_albums(filters))
         return await use_cases.execute_read_albums(filters)
+
     @staticmethod
     @api_router.post("/")
     @inject
-    async def create_artist(
+    async def create_album(
         command: CommandAlbumModel,
         use_cases: FromDishka[CommandAlbumUseCases],
     ):
-        artist = await use_cases.execute_create_user(**command.model_dump())
-        return artist
+        return await use_cases.execute_create_album(**command.model_dump())
 
     @staticmethod
-    @api_router.patch("/{artist_id}")
+    @api_router.patch("/{album_id}")
     @inject
-    async def update_artist(
-        artist_id: str,
+    async def update_album(
+        album_id: str,
         command: CommandAlbumModel,
         use_cases: FromDishka[CommandAlbumUseCases],
     ):
-        artist = await use_cases.execute_update_user(
-            **command.model_dump(), artist_id=artist_id
+        return await use_cases.execute_update_album(
+            **command.model_dump(), album_id=album_id
         )
-        return artist
 
     @staticmethod
     @api_router.delete("/{artist_id}", response_model=ResponseStatusModel)
     @inject
-    async def update_artist(
+    async def delete_album(
         artist_id: str,
         use_cases: FromDishka[CommandAlbumUseCases],
     ) -> ResponseStatusModel:
-        is_deleted = await use_cases.execute_delete_user(artist_id=artist_id)
+        is_deleted = await use_cases.execute_delete_album(artist_id=artist_id)
         return ResponseStatusModel(status=is_deleted)

@@ -1,8 +1,5 @@
-from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
-from typing import Any, List, Optional
-
-from bson import ObjectId
+from dataclasses import dataclass
+from datetime import datetime
 
 from application.entities.enums import AlbumType, Genres
 from domain.entities.base import BaseDomainModel

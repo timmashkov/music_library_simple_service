@@ -1,12 +1,11 @@
-from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
-from typing import Any, List, Optional
+from datetime import datetime
 
 from fastapi_filter.contrib.mongoengine import Filter
 from pydantic import BaseModel, Field
 
-from application.entities.enums import ArtistType, Genres, AlbumType
-from infrastructure.database.models import Artist, Album
+from application.entities.enums import AlbumType, Genres
+from infrastructure.database.models import Album
+from presentation.models._common import DateTimeFieldsResponse, ResponseModelWithAliasID
 from presentation.models._filter import _APIFilter
 
 
@@ -19,10 +18,10 @@ class CommandAlbumModel(BaseModel):
     description: str | None = None
 
 
-class ResponseAlbumModel(CommandAlbumModel):
-    id: str
-    created_at: datetime
-    updated_at: datetime
+class ResponseAlbumModel(
+    CommandAlbumModel, ResponseModelWithAliasID, DateTimeFieldsResponse
+):
+    pass
 
 
 class AlbumFilter(_APIFilter):

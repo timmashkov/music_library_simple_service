@@ -1,45 +1,30 @@
 from typing import Any
 
-from bson import ObjectId
-
 from domain.repositories.album import AlbumReadRepositoryAbs
 from infrastructure.database.database_adapter import MongoDatabaseAdapter
 from infrastructure.database.models import Collections
+from infrastructure.database.repositories.common.read_repository import (
+    _CommonMongoReadRepository,
+)
 
 
 class AlbumReadRepository(AlbumReadRepositoryAbs):
 
     def __init__(self, mongo_adapter: MongoDatabaseAdapter) -> None:
+        self._repository: _CommonMongoReadRepository = _CommonMongoReadRepository(
+            mongo_adapter=mongo_adapter,
+            collection_name=Collections.ALBUM,
+        )
         self.mongo_adapter = mongo_adapter
-        self.collection_name = Collections.ALBUM
 
-    async def get_by_id(self, artist_id: str) -> dict[str, Any]:
-        async with self.mongo_adapter.open_session() as session:
-            collection = await self.mongo_adapter.get_collection(self.collection_name)
-            doc = await collection.find_one(
-                {"_id": ObjectId(artist_id)}, session=session
-            )
-        return doc
+    async def get_by_id(self, album_id: str) -> dict[str, Any]:
+        return await self._repository.get_by_id(album_id)
 
     async def get_by_name(self, name: str) -> dict[str, Any]:
-        async with self.mongo_adapter.open_session() as session:
-            collection = await self.mongo_adapter.get_collection(self.collection_name)
-            doc = await collection.find_one({"name": name}, session=session)
-            return doc
+        return await self._repository.get_by_name(name)
 
     async def search(
-            self,
-            filter_obj,
+        self,
+        filter_obj,
     ) -> list[dict[str, Any]] | None:
-        async with self.mongo_adapter.open_session() as session:
-            collection = await self.mongo_adapter.get_collection(self.collection_name)
-            query = filter_obj.custom_filter()
-            cursor = collection.find(
-                filter=query,
-                session=session
-            )
-            docs = []
-            async for doc in cursor:
-                doc['_id'] = str(doc.pop('_id'))
-                docs.append(doc)
-            return docs
+        return await self._repository.get_list(filter_obj)
