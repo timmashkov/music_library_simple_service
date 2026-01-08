@@ -1,49 +1,47 @@
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, List, Optional, TypeVar
+from datetime import datetime
+from typing import Any
 
 from bson import ObjectId
 
 from infrastructure.database.database_adapter import MongoDatabaseAdapter
 
-T = TypeVar("T")
-M = TypeVar("M")
 
-
-class _CommonMongoWriteRepository(Generic[T, M], ABC):
+class _CommonMongoWriteRepository:
 
     def __init__(self, mongo_adapter: MongoDatabaseAdapter, collection_name: str):
         self.mongo_adapter = mongo_adapter
         self.collection_name = collection_name
 
-    @abstractmethod
-    def _to_model(self, entity: T) -> M:
-        pass
-
-    async def create_item(self, entity: T) -> T:
-        model = self._to_model(entity)
-
+    async def create(self, **kwargs) -> dict[str, Any]:
         async with self.mongo_adapter.open_session() as session:
             collection = await self.mongo_adapter.get_collection(self.collection_name)
-            await collection.insert_one(model.dict(by_alias=True), session=session)
+            result = await collection.insert_one(kwargs, session=session)
+            doc = await collection.find_one(
+                {"_id": result.inserted_id}, session=session
+            )
+            doc["_id"] = str(doc["_id"])
+            return doc
 
-            return entity
-
-    async def update_item(self, entity: T) -> T:
-        model = self._to_model(entity)
-
+    async def update(
+        self, entity_id: str, entity: dict, updated_at: datetime
+    ) -> dict[str, Any]:
+        entity["updated_at"] = updated_at
         async with self.mongo_adapter.open_session() as session:
             collection = await self.mongo_adapter.get_collection(self.collection_name)
             await collection.update_one(
-                {"_id": model.id},
-                {"$set": model.dict(by_alias=True, exclude={"id"})},
-                session=session,
+                {"_id": ObjectId(entity_id)}, {"$set": entity}, session=session
             )
-            return entity
 
-    async def delete_item(self, item_id: str) -> bool:
+            doc = await collection.find_one(
+                {"_id": ObjectId(entity_id)}, session=session
+            )
+            doc["_id"] = str(doc["_id"])
+            return doc
+
+    async def delete(self, entity_id: str) -> bool:
         async with self.mongo_adapter.open_session() as session:
             collection = await self.mongo_adapter.get_collection(self.collection_name)
             result = await collection.delete_one(
-                {"_id": ObjectId(item_id)}, session=session
+                {"_id": ObjectId(entity_id)}, session=session
             )
             return result.deleted_count > 0

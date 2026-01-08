@@ -4,17 +4,18 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Callable
 
 from dishka.integrations.fastapi import setup_dishka
-from fastapi import APIRouter, FastAPI
+from fastapi import FastAPI
 
 from application.config import settings
 from application.providers import ProvidersManager
+from presentation.routers import BaseRouter
 
 
 class APIServer:
     def __init__(
         self,
         name: str,
-        routers: list[APIRouter] | None = None,
+        routers: list[type[BaseRouter]] | None = None,
         start_callbacks: list[Callable] | None = None,
         stop_callbacks: list[Callable] | None = None,
     ) -> None:
@@ -44,7 +45,7 @@ class APIServer:
 
     def _init_routers(self) -> None:
         for router in self.routers:
-            self.app.include_router(router)
+            self.app.include_router(router().api_router)
         logging.info("Routers init successfully!")
 
     @asynccontextmanager

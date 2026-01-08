@@ -1,12 +1,11 @@
-from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
-from typing import Any, List, Optional
+from datetime import datetime
 
 from fastapi_filter.contrib.mongoengine import Filter
 from pydantic import BaseModel, Field
 
-from application.entities.enums import ArtistType, Genres, TrackFormat
+from application.entities.enums import TrackFormat
 from infrastructure.database.models import Track
+from presentation.models._common import DateTimeFieldsResponse, ResponseModelWithAliasID
 from presentation.models._filter import _APIFilter
 
 
@@ -18,10 +17,10 @@ class CommandTrackModel(BaseModel):
     format: TrackFormat
 
 
-class ResponseTrackModel(CommandTrackModel):
-    id: str
-    created_at: datetime
-    updated_at: datetime
+class ResponseTrackModel(
+    CommandTrackModel, ResponseModelWithAliasID, DateTimeFieldsResponse
+):
+    pass
 
 
 class TrackFilter(_APIFilter):

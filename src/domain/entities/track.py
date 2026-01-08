@@ -1,10 +1,7 @@
-from dataclasses import asdict, dataclass
-from datetime import UTC, datetime
-from typing import Any, List, Optional
+from dataclasses import dataclass
+from datetime import datetime
 
-from bson import ObjectId
-
-from application.entities.enums import AlbumType, Genres, TrackFormat
+from application.entities.enums import TrackFormat
 from domain.entities.base import BaseDomainModel
 
 

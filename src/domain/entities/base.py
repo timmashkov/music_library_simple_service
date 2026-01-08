@@ -1,8 +1,5 @@
-from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from dataclasses import asdict, dataclass
 from typing import Any
-
-from bson import ObjectId
 
 
 @dataclass

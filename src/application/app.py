@@ -6,7 +6,7 @@ from presentation.routers.track import TrackRouter
 
 music_app = APIServer(
     name=settings.NAME,
-    routers=[ArtistRouter().api_router, AlbumRouter().api_router, TrackRouter().api_router],
+    routers=[ArtistRouter, AlbumRouter, TrackRouter],
     start_callbacks=[],
     stop_callbacks=[],
 ).app
