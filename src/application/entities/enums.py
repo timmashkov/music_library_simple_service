@@ -22,3 +22,9 @@ class AlbumType(StrEnum):
     TRIPLE = "triple"
     BOX_SET = "box_set"
     MIXTAPE = "mixtape"
+
+
+class TrackFormat(StrEnum):
+    MP3 = "mp3"
+    FLAC = "flac"
+    AAC = "aac"
