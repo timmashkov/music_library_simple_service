@@ -1,11 +1,17 @@
-from enum import StrEnum
+from typing import TypeVar
 
+from ._base import Base
 from .album import Album
 from .artist import Artist
 from .track import Track
 
+table = TypeVar("table")
 
-class Collections(StrEnum):
-    ARTIST: str = Artist.collection_name()
-    ALBUM: str = Album.collection_name()
-    TRACK: str = Track.collection_name()
+
+__all__: tuple[str] = (
+    "Base",
+    "Artist",
+    "Album",
+    "Track",
+    "table",
+)

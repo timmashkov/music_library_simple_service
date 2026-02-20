@@ -1,22 +1,12 @@
 from dishka import Provider, Scope, provide
 
-from infrastructure.database.database_adapter import MongoDatabaseAdapter
-from infrastructure.database.repositories.implementation.album.read_repository import (
+from infrastructure.database import (
     AlbumReadRepository,
-)
-from infrastructure.database.repositories.implementation.album.write_repository import (
     AlbumWriteRepository,
-)
-from infrastructure.database.repositories.implementation.artist.read_repository import (
     ArtistReadRepository,
-)
-from infrastructure.database.repositories.implementation.artist.write_repository import (
     ArtistWriteRepository,
-)
-from infrastructure.database.repositories.implementation.track.read_repository import (
+    DatabaseAdapter,
     TrackReadRepository,
-)
-from infrastructure.database.repositories.implementation.track.write_repository import (
     TrackWriteRepository,
 )
 
@@ -24,36 +14,36 @@ from infrastructure.database.repositories.implementation.track.write_repository 
 class RepositoryProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def get_artist_read_repo(
-        self, mongo_adapter: MongoDatabaseAdapter
+        self, session_adapter: DatabaseAdapter
     ) -> ArtistReadRepository:
-        return ArtistReadRepository(mongo_adapter)
+        return ArtistReadRepository(session_adapter)
 
     @provide(scope=Scope.REQUEST)
     def get_artist_write_repo(
-        self, mongo_adapter: MongoDatabaseAdapter
+        self, session_adapter: DatabaseAdapter
     ) -> ArtistWriteRepository:
-        return ArtistWriteRepository(mongo_adapter)
+        return ArtistWriteRepository(session_adapter)
 
     @provide(scope=Scope.REQUEST)
     def get_album_read_repo(
-        self, mongo_adapter: MongoDatabaseAdapter
+        self, session_adapter: DatabaseAdapter
     ) -> AlbumReadRepository:
-        return AlbumReadRepository(mongo_adapter)
+        return AlbumReadRepository(session_adapter)
 
     @provide(scope=Scope.REQUEST)
     def get_album_write_repo(
-        self, mongo_adapter: MongoDatabaseAdapter
+        self, session_adapter: DatabaseAdapter
     ) -> AlbumWriteRepository:
-        return AlbumWriteRepository(mongo_adapter)
+        return AlbumWriteRepository(session_adapter)
 
     @provide(scope=Scope.REQUEST)
     def get_track_read_repo(
-        self, mongo_adapter: MongoDatabaseAdapter
+        self, session_adapter: DatabaseAdapter
     ) -> TrackReadRepository:
-        return TrackReadRepository(mongo_adapter)
+        return TrackReadRepository(session_adapter)
 
     @provide(scope=Scope.REQUEST)
     def get_track_write_repo(
-        self, mongo_adapter: MongoDatabaseAdapter
+        self, session_adapter: DatabaseAdapter
     ) -> TrackWriteRepository:
-        return TrackWriteRepository(mongo_adapter)
+        return TrackWriteRepository(session_adapter)

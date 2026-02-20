@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
 from fastapi import APIRouter
@@ -10,7 +12,6 @@ from presentation.models.artist import (
     ArtistFilter,
     CreateArtistModel,
     ResponseArtistModel,
-    UpdateArtistModel,
 )
 from presentation.routers import BaseRouter
 
@@ -21,13 +22,13 @@ class ArtistRouter(BaseRouter):
     output_model = ResponseArtistModel
 
     @staticmethod
-    @api_router.get("/{name}", response_model=output_model)
+    @api_router.get("/{artist_id}", response_model=output_model)
     @inject
     async def get_artist(
-        name: str,
+        artist_id: UUID,
         use_cases: FromDishka[QueryArtistUseCases],
     ):
-        return await use_cases.execute_read_artist(name)
+        return await use_cases.execute_read_artist(artist_id)
 
     @staticmethod
     @api_router.get("/", response_model=list[output_model])
@@ -42,7 +43,7 @@ class ArtistRouter(BaseRouter):
     @api_router.post("/", response_model=output_model)
     @inject
     async def create_artist(
-        command: CreateArtistModel,
+        command: input_model,
         use_cases: FromDishka[CommandArtistUseCases],
     ):
         return await use_cases.execute_create_artist(**command.model_dump())
@@ -51,8 +52,8 @@ class ArtistRouter(BaseRouter):
     @api_router.patch("/{artist_id}", response_model=output_model)
     @inject
     async def update_artist(
-        artist_id: str,
-        command: UpdateArtistModel,
+        artist_id: UUID,
+        command: input_model,
         use_cases: FromDishka[CommandArtistUseCases],
     ):
         return await use_cases.execute_update_artist(
@@ -63,7 +64,7 @@ class ArtistRouter(BaseRouter):
     @api_router.delete("/{artist_id}", response_model=ResponseStatusModel)
     @inject
     async def delete_artist(
-        artist_id: str,
+        artist_id: UUID,
         use_cases: FromDishka[CommandArtistUseCases],
     ) -> ResponseStatusModel:
         is_deleted = await use_cases.execute_delete_artist(artist_id=artist_id)

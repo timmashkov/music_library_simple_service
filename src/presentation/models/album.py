@@ -1,26 +1,23 @@
 from datetime import datetime
+from uuid import UUID
 
-from fastapi_filter.contrib.mongoengine import Filter
+from fastapi_filter.contrib.sqlalchemy import Filter
 from pydantic import BaseModel, Field
 
-from application.entities.enums import AlbumType, Genres
 from infrastructure.database.models import Album
-from presentation.models._common import DateTimeFieldsResponse, ResponseModelWithAliasID
+from presentation.models._common import DateTimeFieldsResponse, UUIDResponse
 from presentation.models._filter import _APIFilter
 
 
 class CommandAlbumModel(BaseModel):
-    name: str
-    type: AlbumType
-    genres: list[Genres] | None = None
-    cover: str = None
-    release_year: int | None = None
+    name: str = None
+    data: dict = None
+    cover_url: str | None = None
     description: str | None = None
+    artist_uuid: UUID | None = None
 
 
-class ResponseAlbumModel(
-    CommandAlbumModel, ResponseModelWithAliasID, DateTimeFieldsResponse
-):
+class ResponseAlbumModel(CommandAlbumModel, UUIDResponse, DateTimeFieldsResponse):
     pass
 
 

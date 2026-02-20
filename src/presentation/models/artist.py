@@ -1,34 +1,22 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
-from fastapi_filter.contrib.mongoengine import Filter
+from fastapi_filter.contrib.sqlalchemy import Filter
 from pydantic import BaseModel, Field
 
-from application.entities.enums import ArtistType, Genres
 from infrastructure.database.models import Artist
-from presentation.models._common import DateTimeFieldsResponse, ResponseModelWithAliasID
+from presentation.models._common import DateTimeFieldsResponse, UUIDResponse
 from presentation.models._filter import _APIFilter
 
 
-class UpdateArtistModel(BaseModel):
+class CreateArtistModel(BaseModel):
     name: str
-    type: ArtistType
-    genres: List[Genres]
-    country: Optional[str] = None
+    data: dict = None
     bio: Optional[str] = None
-    images: List[str] = None
-    external_ids: List[str] = None
-    social_links: List[str] = None
-    disbanded_year: Optional[int] = None
+    image_url: str = None
 
 
-class CreateArtistModel(UpdateArtistModel):
-    formed_year: int | None = None
-
-
-class ResponseArtistModel(
-    CreateArtistModel, ResponseModelWithAliasID, DateTimeFieldsResponse
-):
+class ResponseArtistModel(CreateArtistModel, DateTimeFieldsResponse, UUIDResponse):
     pass
 
 

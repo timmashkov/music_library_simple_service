@@ -1,4 +1,5 @@
 from typing import Any
+from uuid import UUID
 
 from domain.entities.album import ResponseAlbumDomainModel
 from domain.entities.artist import ResponseArtistDomainModel
@@ -6,6 +7,7 @@ from domain.entities.track import ResponseTrackDomainModel
 from domain.repositories.album import AlbumReadRepositoryAbs
 from domain.repositories.artist import ArtistReadRepositoryAbs
 from domain.repositories.track import TrackReadRepositoryAbs
+from infrastructure.database.models import Base
 
 
 class QueryArtistUseCases:
@@ -15,12 +17,16 @@ class QueryArtistUseCases:
     async def execute_read_artists(
         self, filters: Any
     ) -> list[ResponseArtistDomainModel] | None:
-        artists = await self.artist_repository.search(filters)
-        return [ResponseArtistDomainModel(**artist) for artist in artists if artists]
+        artists: list[Base] = await self.artist_repository.search(filters)
+        return [
+            ResponseArtistDomainModel(**artist.as_dict())
+            for artist in artists
+            if artists
+        ]
 
-    async def execute_read_artist(self, name: str) -> ResponseArtistDomainModel:
-        artist = await self.artist_repository.get_by_name(name)
-        return ResponseArtistDomainModel(**artist)
+    async def execute_read_artist(self, artist_id: UUID) -> ResponseArtistDomainModel:
+        artist: Base = await self.artist_repository.get_by_id(artist_id)
+        return ResponseArtistDomainModel(**artist.as_dict())
 
 
 class QueryAlbumUseCases:
@@ -30,11 +36,14 @@ class QueryAlbumUseCases:
     async def execute_read_albums(
         self, filters: Any
     ) -> list[ResponseAlbumDomainModel] | None:
-        return await self.album_repository.search(filters)
+        albums: list[Base] = await self.album_repository.search(filters)
+        return [
+            ResponseAlbumDomainModel(**album.as_dict()) for album in albums if albums
+        ]
 
-    async def execute_read_album(self, name: str) -> ResponseAlbumDomainModel:
-        album = await self.album_repository.get_by_id(name)
-        return ResponseAlbumDomainModel(**album)
+    async def execute_read_album(self, album_id: UUID) -> ResponseAlbumDomainModel:
+        album: Base = await self.album_repository.get_by_id(album_id)
+        return ResponseAlbumDomainModel(**album.as_dict())
 
 
 class QueryTrackUseCases:
@@ -44,8 +53,11 @@ class QueryTrackUseCases:
     async def execute_read_tracks(
         self, filters: Any
     ) -> list[ResponseTrackDomainModel] | None:
-        return await self.track_repository.search(filters)
+        tracks: list[Base] = await self.track_repository.search(filters)
+        return [
+            ResponseTrackDomainModel(**track.as_dict()) for track in tracks if tracks
+        ]
 
-    async def execute_read_track(self, name: str) -> ResponseTrackDomainModel:
-        track = await self.track_repository.get_by_name(name)
-        return ResponseTrackDomainModel(**track)
+    async def execute_read_track(self, track_id: UUID) -> ResponseTrackDomainModel:
+        track: Base = await self.track_repository.get_by_id(track_id)
+        return ResponseTrackDomainModel(**track.as_dict())
