@@ -6,6 +6,8 @@ from infrastructure.database import (
     ArtistReadRepository,
     ArtistWriteRepository,
     DatabaseAdapter,
+    GenreReadRepository,
+    GenreWriteRepository,
     TrackReadRepository,
     TrackWriteRepository,
 )
@@ -47,3 +49,15 @@ class RepositoryProvider(Provider):
         self, session_adapter: DatabaseAdapter
     ) -> TrackWriteRepository:
         return TrackWriteRepository(session_adapter)
+
+    @provide(scope=Scope.REQUEST)
+    def get_genre_read_repo(
+        self, session_adapter: DatabaseAdapter
+    ) -> GenreReadRepository:
+        return GenreReadRepository(session_adapter)
+
+    @provide(scope=Scope.REQUEST)
+    def get_genre_write_repo(
+        self, session_adapter: DatabaseAdapter
+    ) -> GenreWriteRepository:
+        return GenreWriteRepository(session_adapter)

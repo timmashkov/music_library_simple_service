@@ -6,14 +6,12 @@ from domain.entities.base import BaseDomainModel
 
 
 @dataclass
-class CreateAlbumDomainModel(BaseDomainModel):
-    cover_url: str | None = None
+class CreateGenreDomainModel(BaseDomainModel):
     description: str | None = None
-    artist_uuid: UUID | None = None
 
 
 @dataclass
-class ResponseAlbumDomainModel(CreateAlbumDomainModel):
+class ResponseGenreDomainModel(CreateGenreDomainModel):
     uuid: UUID | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None

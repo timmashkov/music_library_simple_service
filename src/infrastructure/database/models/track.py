@@ -9,7 +9,7 @@ from application.entities.enums import TrackFormat
 from ._base import Base
 
 if typing.TYPE_CHECKING:
-    from infrastructure.database.models import Album
+    from infrastructure.database.models import Album, Genre
 
 
 class Track(Base):
@@ -38,6 +38,11 @@ class Track(Base):
         nullable=False,
         index=True,
         comment="Album's unique id",
+    )
+    genres: Mapped[typing.List["Genre"]] = relationship(
+        secondary="track_genres",
+        back_populates="tracks",
+        lazy="noload",
     )
     album: Mapped["Album"] = relationship(
         "Album",

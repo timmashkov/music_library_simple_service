@@ -3,9 +3,11 @@ from uuid import UUID
 
 from domain.entities.album import ResponseAlbumDomainModel
 from domain.entities.artist import ResponseArtistDomainModel
+from domain.entities.genre import ResponseGenreDomainModel
 from domain.entities.track import ResponseTrackDomainModel
 from domain.repositories.album import AlbumReadRepositoryAbs
 from domain.repositories.artist import ArtistReadRepositoryAbs
+from domain.repositories.genre import GenreReadRepositoryAbs
 from domain.repositories.track import TrackReadRepositoryAbs
 from infrastructure.database.models import Base
 
@@ -61,3 +63,20 @@ class QueryTrackUseCases:
     async def execute_read_track(self, track_id: UUID) -> ResponseTrackDomainModel:
         track: Base = await self.track_repository.get_by_id(track_id)
         return ResponseTrackDomainModel(**track.as_dict())
+
+
+class QueryGenreUseCases:
+    def __init__(self, genre_repository: GenreReadRepositoryAbs) -> None:
+        self.genre_repository = genre_repository
+
+    async def execute_read_tracks(
+        self, filters: Any
+    ) -> list[ResponseGenreDomainModel] | None:
+        tracks: list[Base] = await self.genre_repository.search(filters)
+        return [
+            ResponseGenreDomainModel(**track.as_dict()) for track in tracks if tracks
+        ]
+
+    async def execute_read_track(self, track_id: UUID) -> ResponseGenreDomainModel:
+        track: Base = await self.genre_repository.get_by_id(track_id)
+        return ResponseGenreDomainModel(**track.as_dict())

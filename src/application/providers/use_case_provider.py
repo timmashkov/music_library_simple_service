@@ -3,29 +3,23 @@ from dishka import Provider, Scope, provide
 from application.use_cases.command_use_caces import (
     CommandAlbumUseCases,
     CommandArtistUseCases,
+    CommandGenreUseCases,
     CommandTrackUseCases,
 )
 from application.use_cases.queries_use_caces import (
     QueryAlbumUseCases,
     QueryArtistUseCases,
+    QueryGenreUseCases,
     QueryTrackUseCases,
 )
-from infrastructure.database.repositories.implementation.album.read_repository import (
+from infrastructure.database import (
     AlbumReadRepository,
-)
-from infrastructure.database.repositories.implementation.album.write_repository import (
     AlbumWriteRepository,
-)
-from infrastructure.database.repositories.implementation.artist.read_repository import (
     ArtistReadRepository,
-)
-from infrastructure.database.repositories.implementation.artist.write_repository import (
     ArtistWriteRepository,
-)
-from infrastructure.database.repositories.implementation.track.read_repository import (
+    GenreReadRepository,
+    GenreWriteRepository,
     TrackReadRepository,
-)
-from infrastructure.database.repositories.implementation.track.write_repository import (
     TrackWriteRepository,
 )
 
@@ -66,3 +60,15 @@ class UseCaseProvider(Provider):
         self, _repository: TrackWriteRepository
     ) -> CommandTrackUseCases:
         return CommandTrackUseCases(_repository)
+
+    @provide(scope=Scope.REQUEST)
+    def provide_query_genre_use_cases(
+        self, _repository: GenreReadRepository
+    ) -> QueryGenreUseCases:
+        return QueryGenreUseCases(_repository)
+
+    @provide(scope=Scope.REQUEST)
+    def provide_command_genre_use_cases(
+        self, _repository: GenreWriteRepository
+    ) -> CommandGenreUseCases:
+        return CommandGenreUseCases(_repository)

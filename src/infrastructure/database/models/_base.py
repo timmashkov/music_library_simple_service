@@ -6,7 +6,15 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column
 
 
-class Base(DeclarativeBase):
+class MatViewBase(DeclarativeBase):
+
+    __abstract__ = True
+
+    def as_dict(self) -> dict:
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+class Base(MatViewBase):
 
     __abstract__ = True
 
