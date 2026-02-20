@@ -1,11 +1,12 @@
 from datetime import datetime
+from uuid import UUID
 
-from fastapi_filter.contrib.mongoengine import Filter
+from fastapi_filter.contrib.sqlalchemy import Filter
 from pydantic import BaseModel, Field
 
 from application.entities.enums import TrackFormat
 from infrastructure.database.models import Track
-from presentation.models._common import DateTimeFieldsResponse, ResponseModelWithAliasID
+from presentation.models._common import DateTimeFieldsResponse, UUIDResponse
 from presentation.models._filter import _APIFilter
 
 
@@ -14,12 +15,12 @@ class CommandTrackModel(BaseModel):
     duration: int
     audio_url: str | None
     bitrate: str
+    artist_uuid: UUID
+    album_uuid: UUID
     format: TrackFormat
 
 
-class ResponseTrackModel(
-    CommandTrackModel, ResponseModelWithAliasID, DateTimeFieldsResponse
-):
+class ResponseTrackModel(CommandTrackModel, UUIDResponse, DateTimeFieldsResponse):
     pass
 
 

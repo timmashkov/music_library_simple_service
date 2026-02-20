@@ -1,14 +1,19 @@
-from typing import Any
+from typing import Any, ItemsView
 
-from fastapi_filter.contrib.mongoengine import Filter
+from fastapi_filter.contrib.sqlalchemy import Filter
+from sqlalchemy import select
 
 
 class _APIFilter(Filter):
+    def sort(self, query: select) -> select:
+        for field_name, _ in self._filter_fields_to_items:
+            field_value = getattr(self, field_name)
+            if isinstance(field_value, Filter):
+                query = field_value.sort(query)
+        return super().sort(query)
 
-    def custom_filter(self) -> dict[str, Any]:
-        filters = self.model_dump()
-        filters.pop("sorted_by")
-        return {key: value for key, value in filters.items() if value is not None}
-
-    def custom_sort(self) -> list[str]:
-        return self.sorted_by
+    @property
+    def _filter_fields_to_items(self) -> ItemsView[str, Any]:
+        fields = self.model_dump(exclude_none=True)
+        fields.pop(self.Constants.ordering_field_name, None)
+        return fields.items()

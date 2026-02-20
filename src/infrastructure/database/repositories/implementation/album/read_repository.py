@@ -1,30 +1,27 @@
-from typing import Any
+from typing import Iterable
+from uuid import UUID
 
 from domain.repositories.album import AlbumReadRepositoryAbs
-from infrastructure.database.database_adapter import MongoDatabaseAdapter
-from infrastructure.database.models import Collections
-from infrastructure.database.repositories.common.read_repository import (
-    _CommonMongoReadRepository,
+from infrastructure.database.database_adapter import DatabaseAdapter
+from infrastructure.database.models import Album
+from infrastructure.database.repositories.common.common_read_repo import (
+    _CommonReadRepository,
 )
 
 
 class AlbumReadRepository(AlbumReadRepositoryAbs):
 
-    def __init__(self, mongo_adapter: MongoDatabaseAdapter) -> None:
-        self._repository: _CommonMongoReadRepository = _CommonMongoReadRepository(
-            mongo_adapter=mongo_adapter,
-            collection_name=Collections.ALBUM,
+    def __init__(self, session_adapter: DatabaseAdapter) -> None:
+        self._session = session_adapter.autocommit_session
+        self._read_repo: _CommonReadRepository = _CommonReadRepository(
+            session_adapter=session_adapter, model=Album
         )
-        self.mongo_adapter = mongo_adapter
 
-    async def get_by_id(self, album_id: str) -> dict[str, Any]:
-        return await self._repository.get_by_id(album_id)
-
-    async def get_by_name(self, name: str) -> dict[str, Any]:
-        return await self._repository.get_by_name(name)
+    async def get_by_id(self, user_id: UUID) -> Album | None:
+        return await self._read_repo.get_item(user_id)
 
     async def search(
         self,
         filter_obj,
-    ) -> list[dict[str, Any]] | None:
-        return await self._repository.get_list(filter_obj)
+    ) -> Iterable[Album] | None:
+        return await self._read_repo.find(filter_obj)

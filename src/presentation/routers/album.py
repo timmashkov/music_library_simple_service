@@ -31,7 +31,6 @@ class AlbumRouter(BaseRouter):
         use_cases: FromDishka[QueryAlbumUseCases],
         filters: AlbumFilter = FilterDepends(AlbumFilter),
     ):
-        print(await use_cases.execute_read_albums(filters))
         return await use_cases.execute_read_albums(filters)
 
     @staticmethod

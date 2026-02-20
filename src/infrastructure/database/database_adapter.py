@@ -1,43 +1,68 @@
-from contextlib import asynccontextmanager
-from typing import AsyncGenerator
-
-from motor.motor_asyncio import (
-    AsyncIOMotorClient,
-    AsyncIOMotorClientSession,
-    AsyncIOMotorCollection,
-)
+from sqlalchemy import AsyncAdaptedQueuePool, Pool
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 
-class MongoDatabaseAdapter:
+class DatabaseAdapter:
     def __init__(
         self,
         host: str,
         port: int,
-        user: str,
+        dialect: str,
+        login: str,
         password: str,
-        database_name: str,
+        database: str,
+        echo: bool,
+        pool_class: Pool = AsyncAdaptedQueuePool,
+        pool_size: int = 5,
+        max_overflow: int = 10,
+        pool_timeout: int = 30,
+        pool_recycle: int = 3600,
     ) -> None:
+        self.dialect = dialect
+        self.login = login
+        self.password = password
         self.host = host
         self.port = port
-        self.user = user
-        self.database_name = database_name
-        self.password = password
-        self._client: AsyncIOMotorClient = AsyncIOMotorClient(
-            self.db_url, authSource="admin"
+        self.echo = echo
+        self.database = database
+        self.pool_class = pool_class
+        self.pool_size = pool_size
+        self.max_overflow = max_overflow
+        self.pool_timeout = pool_timeout
+        self.pool_recycle = pool_recycle
+
+        self._engine = create_async_engine(
+            url=self._db_url,
+            echo=self.echo,
+            **self.pool_config,
         )
-        self._database = self._client[database_name]
+        self._autocommit_session = self._engine.execution_options(
+            isolation_level="AUTOCOMMIT",
+        )
+        self._transactional_session = async_sessionmaker(
+            bind=self._engine,
+            expire_on_commit=False,
+        )
+        self._autocommit_session = async_sessionmaker(self._autocommit_session)
 
     @property
-    def db_url(self) -> str:
-        return f"mongodb://{self.user}:{self.password}@{self.host}:{self.port}/{self.database_name}authSource=admin"
+    def _db_url(self) -> str:
+        return f"postgresql+{self.dialect}://{self.login}:{self.password}@{self.host}:{self.port}/{self.database}"
 
-    @asynccontextmanager
-    async def open_session(self) -> AsyncGenerator[AsyncIOMotorClientSession, None]:
-        session = await self._client.start_session()
-        try:
-            yield session
-        finally:
-            await session.end_session()
+    @property
+    def pool_config(self) -> dict[str:int]:
+        return {
+            "pool_size": self.pool_size,
+            "max_overflow": self.max_overflow,
+            "pool_timeout": self.pool_timeout,
+            "pool_recycle": self.pool_recycle,
+            "poolclass": self.pool_class,
+        }
 
-    async def get_collection(self, collection_name: str) -> AsyncIOMotorCollection:
-        return self._database[collection_name]
+    @property
+    def transactional_session(self) -> async_sessionmaker[AsyncSession]:
+        return self._transactional_session
+
+    @property
+    def autocommit_session(self) -> async_sessionmaker[AsyncSession]:
+        return self._autocommit_session

@@ -1,19 +1,17 @@
 from datetime import datetime
+from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class ResponseStatusModel(BaseModel):
     status: bool
 
 
-class ResponseModelWithAliasID(BaseModel):
-    id: str = Field(alias="_id")
-
-    class Config:
-        populate_by_name = True
-
-
 class DateTimeFieldsResponse(BaseModel):
     created_at: datetime | None
     updated_at: datetime | None
+
+
+class UUIDResponse(BaseModel):
+    uuid: UUID

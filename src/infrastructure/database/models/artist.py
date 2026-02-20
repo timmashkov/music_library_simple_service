@@ -1,13 +1,29 @@
-from application.entities.enums import ArtistType, Genres
-from infrastructure.database.models._base import BaseMongoModel
+import typing
+
+from sqlalchemy import String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from ._base import Base
+
+if typing.TYPE_CHECKING:
+    from infrastructure.database.models import Album
 
 
-class Artist(BaseMongoModel):
-    type: ArtistType
-    genres: list[Genres] | None = None
-    country: str | None = None
-    bio: str | None = None
-    images: list[str] = None
-    social_links: list[str] = None
-    formed_year: int | None = None
-    disbanded_year: int | None = None
+class Artist(Base):
+
+    name: Mapped[str] = mapped_column(
+        String, nullable=False, unique=True, comment="Artist's name"
+    )
+    bio: Mapped[str | None] = mapped_column(Text, comment="Artist's biography")
+    image_url: Mapped[str | None] = mapped_column(
+        String, comment="Image's url in minio"
+    )
+
+    albums: Mapped[typing.List["Album"]] = relationship(
+        "Album",
+        back_populates="artist",
+        cascade="all, delete-orphan",
+        passive_updates=True,
+        passive_deletes=True,
+        lazy="noload",
+    )
