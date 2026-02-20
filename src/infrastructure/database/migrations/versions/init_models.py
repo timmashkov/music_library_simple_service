@@ -1,8 +1,8 @@
 """init_models
 
-Revision ID: 7c38ed9af606
+Revision ID: ff24614274c8
 Revises:
-Create Date: 2026-02-19 23:36:48.391627
+Create Date: 2026-02-20 13:35:17.996497
 
 """
 
@@ -13,7 +13,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "7c38ed9af606"
+revision: str = "ff24614274c8"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -58,6 +58,41 @@ def upgrade() -> None:
         sa.UniqueConstraint("name"),
     )
     op.create_index(op.f("ix_artists_uuid"), "artists", ["uuid"], unique=False)
+    op.create_table(
+        "genres",
+        sa.Column("name", sa.String(), nullable=False, comment="Genre's title"),
+        sa.Column(
+            "description",
+            sa.Text(),
+            nullable=True,
+            comment="Genre's description",
+        ),
+        sa.Column("uuid", sa.UUID(), nullable=False, comment="Уникальный айди записи"),
+        sa.Column(
+            "created_at",
+            sa.DateTime(),
+            server_default=sa.text("now()"),
+            nullable=False,
+            comment="Дата создания",
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(),
+            server_default=sa.text("now()"),
+            nullable=False,
+            comment="Дата обновления",
+        ),
+        sa.Column(
+            "data",
+            postgresql.JSONB(astext_type=sa.Text()),
+            server_default="{}",
+            nullable=False,
+            comment="Дополнительные данные",
+        ),
+        sa.PrimaryKeyConstraint("uuid"),
+        sa.UniqueConstraint("name"),
+    )
+    op.create_index(op.f("ix_genres_uuid"), "genres", ["uuid"], unique=False)
     op.create_table(
         "albums",
         sa.Column("name", sa.String(), nullable=False, comment="Album's title"),
@@ -112,6 +147,46 @@ def upgrade() -> None:
         op.f("ix_albums_artist_uuid"), "albums", ["artist_uuid"], unique=False
     )
     op.create_index(op.f("ix_albums_uuid"), "albums", ["uuid"], unique=False)
+    op.create_table(
+        "album_genres",
+        sa.Column("album_uuid", sa.UUID(), nullable=False),
+        sa.Column("genre_uuid", sa.UUID(), nullable=False),
+        sa.Column("uuid", sa.UUID(), nullable=False, comment="Уникальный айди записи"),
+        sa.Column(
+            "created_at",
+            sa.DateTime(),
+            server_default=sa.text("now()"),
+            nullable=False,
+            comment="Дата создания",
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(),
+            server_default=sa.text("now()"),
+            nullable=False,
+            comment="Дата обновления",
+        ),
+        sa.Column(
+            "data",
+            postgresql.JSONB(astext_type=sa.Text()),
+            server_default="{}",
+            nullable=False,
+            comment="Дополнительные данные",
+        ),
+        sa.ForeignKeyConstraint(
+            ["album_uuid"],
+            ["albums.uuid"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["genre_uuid"],
+            ["genres.uuid"],
+        ),
+        sa.PrimaryKeyConstraint("album_uuid", "genre_uuid", "uuid"),
+        sa.UniqueConstraint("album_uuid", "genre_uuid", name="idx_unique_album_genre"),
+    )
+    op.create_index(
+        op.f("ix_album_genres_uuid"), "album_genres", ["uuid"], unique=False
+    )
     op.create_table(
         "tracks",
         sa.Column("name", sa.String(), nullable=False, comment="Track's title"),
@@ -186,19 +261,65 @@ def upgrade() -> None:
         op.f("ix_tracks_artist_uuid"), "tracks", ["artist_uuid"], unique=False
     )
     op.create_index(op.f("ix_tracks_uuid"), "tracks", ["uuid"], unique=False)
+    op.create_table(
+        "track_genres",
+        sa.Column("track_uuid", sa.UUID(), nullable=False),
+        sa.Column("genre_uuid", sa.UUID(), nullable=False),
+        sa.Column("uuid", sa.UUID(), nullable=False, comment="Уникальный айди записи"),
+        sa.Column(
+            "created_at",
+            sa.DateTime(),
+            server_default=sa.text("now()"),
+            nullable=False,
+            comment="Дата создания",
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(),
+            server_default=sa.text("now()"),
+            nullable=False,
+            comment="Дата обновления",
+        ),
+        sa.Column(
+            "data",
+            postgresql.JSONB(astext_type=sa.Text()),
+            server_default="{}",
+            nullable=False,
+            comment="Дополнительные данные",
+        ),
+        sa.ForeignKeyConstraint(
+            ["genre_uuid"],
+            ["genres.uuid"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["track_uuid"],
+            ["tracks.uuid"],
+        ),
+        sa.PrimaryKeyConstraint("track_uuid", "genre_uuid", "uuid"),
+        sa.UniqueConstraint("track_uuid", "genre_uuid", name="idx_unique_track_genre"),
+    )
+    op.create_index(
+        op.f("ix_track_genres_uuid"), "track_genres", ["uuid"], unique=False
+    )
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_index(op.f("ix_track_genres_uuid"), table_name="track_genres")
+    op.drop_table("track_genres")
     op.drop_index(op.f("ix_tracks_uuid"), table_name="tracks")
     op.drop_index(op.f("ix_tracks_artist_uuid"), table_name="tracks")
     op.drop_index(op.f("ix_tracks_album_uuid"), table_name="tracks")
     op.drop_table("tracks")
+    op.drop_index(op.f("ix_album_genres_uuid"), table_name="album_genres")
+    op.drop_table("album_genres")
     op.drop_index(op.f("ix_albums_uuid"), table_name="albums")
     op.drop_index(op.f("ix_albums_artist_uuid"), table_name="albums")
     op.drop_table("albums")
+    op.drop_index(op.f("ix_genres_uuid"), table_name="genres")
+    op.drop_table("genres")
     op.drop_index(op.f("ix_artists_uuid"), table_name="artists")
     op.drop_table("artists")
     # ### end Alembic commands ###

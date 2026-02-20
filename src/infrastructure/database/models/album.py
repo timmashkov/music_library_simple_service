@@ -2,12 +2,12 @@ import typing
 import uuid
 
 from sqlalchemy import ForeignKey, String, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, query_expression, relationship
 
 from ._base import Base
 
 if typing.TYPE_CHECKING:
-    from infrastructure.database.models import Artist, Track
+    from infrastructure.database.models import Artist, Genre, Track
 
 
 class Album(Base):
@@ -28,6 +28,14 @@ class Album(Base):
 
     artist: Mapped["Artist"] = relationship(
         "Artist",
+        back_populates="albums",
+        lazy="noload",
+    )
+
+    tracks_count: Mapped[int] = query_expression()
+
+    genres: Mapped[typing.List["Genre"]] = relationship(
+        secondary="album_genres",
         back_populates="albums",
         lazy="noload",
     )
