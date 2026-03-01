@@ -9,6 +9,7 @@ from domain.repositories.album import AlbumWriteRepositoryAbs
 from domain.repositories.artist import ArtistWriteRepositoryAbs
 from domain.repositories.genre import GenreWriteRepositoryAbs
 from domain.repositories.track import TrackWriteRepositoryAbs
+from presentation.models._common import AddGenreModel
 
 
 class CommandArtistUseCases:
@@ -38,6 +39,9 @@ class CommandAlbumUseCases:
         command = CreateAlbumDomainModel(**kwargs)
         return await self.album_repository.create(command)
 
+    async def execute_add_track(self, data: AddGenreModel):
+        return await self.album_repository.add_genre(data.genre_uuid, data.domain_uuid)
+
     async def execute_update_album(self, **kwargs) -> ResponseAlbumDomainModel:
         artist_id = kwargs.pop("artist_id")
         command = CreateAlbumDomainModel(**kwargs)
@@ -52,6 +56,9 @@ class CommandAlbumUseCases:
 class CommandTrackUseCases:
     def __init__(self, track_repository: TrackWriteRepositoryAbs) -> None:
         self.track_repository = track_repository
+
+    async def execute_add_track(self, data: AddGenreModel):
+        return await self.track_repository.add_genre(data.genre_uuid, data.domain_uuid)
 
     async def execute_create_track(self, **kwargs) -> ResponseTrackDomainModel:
         command = CreateTrackDomainModel(**kwargs)

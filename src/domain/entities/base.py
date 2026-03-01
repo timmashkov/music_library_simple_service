@@ -2,7 +2,7 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 
-@dataclass
+@dataclass(kw_only=True)
 class BaseDomainModel:
     name: str
     data: dict = None

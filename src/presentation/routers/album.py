@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
 from fastapi import APIRouter
@@ -5,7 +7,7 @@ from fastapi_filter import FilterDepends
 
 from application.use_cases.command_use_caces import CommandAlbumUseCases
 from application.use_cases.queries_use_caces import QueryAlbumUseCases
-from presentation.models._common import ResponseStatusModel
+from presentation.models._common import AddGenreModel, ResponseStatusModel
 from presentation.models.album import AlbumFilter, CommandAlbumModel, ResponseAlbumModel
 from presentation.routers import BaseRouter
 
@@ -31,7 +33,20 @@ class AlbumRouter(BaseRouter):
         use_cases: FromDishka[QueryAlbumUseCases],
         filters: AlbumFilter = FilterDepends(AlbumFilter),
     ):
-        return await use_cases.execute_read_albums(filters)
+        lst = await use_cases.execute_read_albums(filters)
+        print(lst)
+        return lst
+
+    @staticmethod
+    @api_router.post("/{domain_uuid}/genres", response_model=None)
+    @inject
+    async def add_genre_to_albim(
+        use_cases: FromDishka[CommandAlbumUseCases],
+        domain_uuid: UUID,
+        data: AddGenreModel,
+    ):
+        data.domain_uuid = domain_uuid
+        return await use_cases.execute_add_track(data)
 
     @staticmethod
     @api_router.post("/")

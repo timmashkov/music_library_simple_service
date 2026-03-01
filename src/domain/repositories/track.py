@@ -4,7 +4,6 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from domain.entities.base import BaseDomainModel
-from presentation.models._filter import _APIFilter
 
 
 class TrackReadRepositoryAbs(ABC):
@@ -14,7 +13,7 @@ class TrackReadRepositoryAbs(ABC):
         pass
 
     @abstractmethod
-    async def search(self, query: _APIFilter) -> List[Any]:
+    async def search(self, query: Any) -> List[Any]:
         pass
 
 
@@ -22,6 +21,10 @@ class TrackWriteRepositoryAbs(ABC):
 
     @abstractmethod
     async def create(self, track: BaseDomainModel) -> Any:
+        pass
+
+    @abstractmethod
+    async def add_genre(self, genre_uuid: UUID, track_uuid: UUID) -> Any:
         pass
 
     @abstractmethod

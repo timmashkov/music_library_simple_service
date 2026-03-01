@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import UUID, func
+from sqlalchemy import UUID, func, inspect
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column
 
@@ -53,4 +53,11 @@ class Base(MatViewBase):
     )
 
     def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        mapper = inspect(self).mapper
+
+        data = {c.key: getattr(self, c.key) for c in mapper.column_attrs}
+
+        for rel in mapper.relationships:
+            data[rel.key] = getattr(self, rel.key)
+
+        return data

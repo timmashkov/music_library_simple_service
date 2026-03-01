@@ -14,7 +14,6 @@ class _CommonWriteRepository(Generic[table]):
         self._session: async_sessionmaker = session_adapter.transactional_session
 
     async def create_item(self, **kwargs: Any) -> table | None:
-        print(kwargs)
         async with self._session() as session:
             stmt = insert(self._model).values(kwargs).returning(self._model)
             answer = await session.execute(stmt)

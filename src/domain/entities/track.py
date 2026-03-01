@@ -3,7 +3,9 @@ from datetime import datetime
 from uuid import UUID
 
 from application.entities.enums import TrackFormat
+from domain.entities.album import ResponseAlbumDomainModel
 from domain.entities.base import BaseDomainModel
+from domain.entities.genre import ResponseGenreDomainModel
 
 
 @dataclass
@@ -16,8 +18,10 @@ class CreateTrackDomainModel(BaseDomainModel):
     album_uuid: UUID = None
 
 
-@dataclass
+@dataclass(kw_only=True)
 class ResponseTrackDomainModel(CreateTrackDomainModel):
-    _id: str | None = None
+    album: ResponseAlbumDomainModel | None
+    genres: list[ResponseGenreDomainModel] | None
+    uuid: UUID | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None

@@ -15,3 +15,8 @@ class DateTimeFieldsResponse(BaseModel):
 
 class UUIDResponse(BaseModel):
     uuid: UUID
+
+
+class AddGenreModel(BaseModel):
+    genre_uuid: UUID
+    domain_uuid: UUID | None = None

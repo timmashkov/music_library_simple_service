@@ -1,12 +1,15 @@
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from fastapi_filter.contrib.sqlalchemy import Filter
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from infrastructure.database.models import Artist
 from presentation.models._common import DateTimeFieldsResponse, UUIDResponse
 from presentation.models._filter import _APIFilter
+
+if TYPE_CHECKING:
+    from .album import ResponseAlbumModel
 
 
 class CreateArtistModel(BaseModel):
@@ -17,7 +20,9 @@ class CreateArtistModel(BaseModel):
 
 
 class ResponseArtistModel(CreateArtistModel, DateTimeFieldsResponse, UUIDResponse):
-    pass
+    albums: list["ResponseAlbumModel"] | None
+    albums_count: int | None
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ArtistFilter(_APIFilter):

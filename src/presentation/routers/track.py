@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
 from fastapi import APIRouter
@@ -5,7 +7,7 @@ from fastapi_filter import FilterDepends
 
 from application.use_cases.command_use_caces import CommandTrackUseCases
 from application.use_cases.queries_use_caces import QueryTrackUseCases
-from presentation.models._common import ResponseStatusModel
+from presentation.models._common import AddGenreModel, ResponseStatusModel
 from presentation.models.track import CommandTrackModel, ResponseTrackModel, TrackFilter
 from presentation.routers import BaseRouter
 
@@ -32,6 +34,17 @@ class TrackRouter(BaseRouter):
         filters: TrackFilter = FilterDepends(TrackFilter),
     ):
         return await use_cases.execute_read_tracks(filters)
+
+    @staticmethod
+    @api_router.post("/{domain_uuid}/genres", response_model=None)
+    @inject
+    async def add_genre_to_track(
+        use_cases: FromDishka[CommandTrackUseCases],
+        domain_uuid: UUID,
+        data: AddGenreModel,
+    ):
+        data.domain_uuid = domain_uuid
+        return await use_cases.execute_add_track(data)
 
     @staticmethod
     @api_router.post("/", response_model=output_model)

@@ -4,7 +4,6 @@ from typing import Any, List, Optional
 from uuid import UUID
 
 from domain.entities.base import BaseDomainModel
-from presentation.models._filter import _APIFilter
 
 
 class ArtistReadRepositoryAbs(ABC):
@@ -14,7 +13,7 @@ class ArtistReadRepositoryAbs(ABC):
         pass
 
     @abstractmethod
-    async def search(self, query: _APIFilter) -> List[Any]:
+    async def search(self, query: Any) -> List[Any]:
         pass
 
 
